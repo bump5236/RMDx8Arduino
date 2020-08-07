@@ -1,0 +1,9 @@
+name=RMDx8 Arduino Library
+version=0.0.0
+author=Takuya Sanada
+maintainer=Sanolab <http://rah.web.nitech.ac.jp/>
+sentence=This is a library for control RMD-X8 with can.
+paragraph=This is a library for the control RMD-X8 with can.
+category=Device Control
+url=
+architectures=*
