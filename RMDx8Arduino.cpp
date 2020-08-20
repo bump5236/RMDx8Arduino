@@ -1,4 +1,3 @@
-/*sampleClass.cpp - Library for sample code.*/
 
 #include "Arduino.h"
 #include "RMDx8Arduino.h"
