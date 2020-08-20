@@ -18,13 +18,13 @@ RMD-X8モータのCAN通信用コマンドのクラス
 2. 本リポジトリをクローンもしくはダウンロードし、C:\Users\ユーザー名\Documents\Arduino\libraries\に保存
 
 # Usage
-C:\Users\ユーザー名\Documents\Arduino\librariesのディレクトリに配置されていれば、
+C:\Users\ユーザー名\Documents\Arduino\librariesのディレクトリに配置されていれば、\
 プログラムにて
 `#include <RMDx8Arduino.h> `
 で読み込むことができる。
 
 # Note
-全部のコマンドがあるわけではない
+全部のコマンドがあるわけではない\
 データは8Byteで吐き出される
 
 # Reference
