@@ -24,7 +24,7 @@ void setup() {
     delay(1000);
 
     rmd.canSetup();
-    rmd.ppp(MOTOR_ADDRESS);
+    rmd.writePosition(MOTOR_ADDRESS, 65536);
 
     delay(1000);
 

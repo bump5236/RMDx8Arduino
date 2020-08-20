@@ -8,12 +8,6 @@
 RMDx8Arduino::RMDx8Arduino(MCP_CAN &CAN) 
     :_CAN(CAN){}
 
-// pppはデバッグ用関数のためそのうち削除
-void RMDx8Arduino::ppp(const unsigned char motor_addr) {
-    Serial.println("MOTOR:");
-    Serial.println(motor_addr);
-}
-
 void RMDx8Arduino::canSetup() {
     while (CAN_OK != _CAN.begin(CAN_1000KBPS)) {
         Serial.println("CAN BUS Shield init fail");
@@ -24,7 +18,7 @@ void RMDx8Arduino::canSetup() {
     Serial.println("CAN BUS Shield init ok!");
 }
 
-void RMDx8Arduino::clearState(const unsigned char motor_addr) {
+void RMDx8Arduino::clearState(const uint16_t motor_addr) {
     cmd_buf[0] = 0x80;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -37,21 +31,7 @@ void RMDx8Arduino::clearState(const unsigned char motor_addr) {
     writeCmd(motor_addr, cmd_buf);
 }
 
-// writeコマンドとセットで使うこと
-void RMDx8Arduino::readState() {
-    //check if data coming
-    if (CAN_MSGAVAIL == _CAN.checkReceive()) {
-        _CAN.readMsgBuf(&len, reply_buf); //read data, len: data length, buf: data buf
-
-        unsigned char cmd_byte = reply_buf[0];
-        uint8_t temperature = reply_buf[1];
-        int16_t cur = reply_buf[2] + (reply_buf[3] << 8);
-        int16_t vel = reply_buf[4] + (reply_buf[5] << 8);
-        int16_t pos = reply_buf[6] + (reply_buf[7] << 8);    // 16bit以下のエンコーダのとき
-    }
-}
-
-void RMDx8Arduino::readPID(const unsigned char motor_addr) {
+void RMDx8Arduino::readPID(const uint16_t motor_addr) {
     cmd_buf[0] = 0x30;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -60,7 +40,7 @@ void RMDx8Arduino::readPID(const unsigned char motor_addr) {
     cmd_buf[5] = 0x00;
     cmd_buf[6] = 0x00;
     cmd_buf[7] = 0x00;
-
+    
     // Send message
     writeCmd(motor_addr, cmd_buf);
     delay(100);
@@ -79,7 +59,7 @@ void RMDx8Arduino::readPID(const unsigned char motor_addr) {
 }
 
 
-void RMDx8Arduino::writePID(const unsigned char motor_addr, int posKp, int posKi, int velKp, int velKi, int iqKp, int iqKi) {
+void RMDx8Arduino::writePID(const uint16_t motor_addr, int posKp, int posKi, int velKp, int velKi, int iqKp, int iqKi) {
     cmd_buf[0] = 0x31;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = posKp;
@@ -93,7 +73,7 @@ void RMDx8Arduino::writePID(const unsigned char motor_addr, int posKp, int posKi
     writeCmd(motor_addr, cmd_buf);
 }
 
-void RMDx8Arduino::writeCurrent(const unsigned char motor_addr, int16_t current) {
+void RMDx8Arduino::writeCurrent(const uint16_t motor_addr, int16_t current) {
     // current control is int16_t type. (2byteの符号付き整数)
     cmd_buf[0] = 0xA1;
     cmd_buf[1] = 0x00;
@@ -108,7 +88,7 @@ void RMDx8Arduino::writeCurrent(const unsigned char motor_addr, int16_t current)
     writeCmd(motor_addr, cmd_buf);
 }
 
-void RMDx8Arduino::writeVelocity(const unsigned char motor_addr, int32_t velocity) {
+void RMDx8Arduino::writeVelocity(const uint16_t motor_addr, int32_t velocity) {
     // velocity control is int32_t type. (4byteの符号付き整数)
     cmd_buf[0] = 0xA2;
     cmd_buf[1] = 0x00;
@@ -123,7 +103,7 @@ void RMDx8Arduino::writeVelocity(const unsigned char motor_addr, int32_t velocit
     writeCmd(motor_addr, cmd_buf);
 }
 
-void RMDx8Arduino::writePosition(const unsigned char motor_addr, int32_t position) {
+void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position) {
   // position control is int32_t type. (4byteの符号付き整数)
   cmd_buf[0] = 0xA3;
   cmd_buf[1] = 0x00;
@@ -145,7 +125,7 @@ void RMDx8Arduino::serialWriteTerminator() {
 }
 
 // Private
-void RMDx8Arduino::writeCmd(const unsigned char motor_addr, unsigned char *buf) {
+void RMDx8Arduino::writeCmd(const uint16_t motor_addr, unsigned char *buf) {
     // CAN通信で送る
     unsigned char sendState = _CAN.sendMsgBuf(motor_addr, 0, 8, buf);
     if (sendState != CAN_OK) {
