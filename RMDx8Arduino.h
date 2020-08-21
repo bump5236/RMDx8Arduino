@@ -9,7 +9,7 @@
 class RMDx8Arduino {
 public:
     unsigned char len;
-    unsigned char cmd_buf[8], reply_buf[8], pos_buf[8];
+    unsigned char tmp_buf[8], cmd_buf[8], reply_buf[8], pos_buf[8];
 
     RMDx8Arduino(MCP_CAN &CAN);    // クラスと同一の名前にするとコンストラクタ扱い
 

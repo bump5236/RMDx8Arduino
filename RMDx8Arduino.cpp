@@ -53,7 +53,7 @@ void RMDx8Arduino::writePID(const uint16_t motor_addr, int posKp, int posKi, int
 
 void RMDx8Arduino::readAngle(const uint16_t motor_addr, char n) {
     switch(n) {
-        case "multi": // multi turns
+        case 1: // multi turns
             cmd_buf[0] = 0x92;
             cmd_buf[1] = 0x00;
             cmd_buf[2] = 0x00;
@@ -78,9 +78,9 @@ void RMDx8Arduino::readAngle(const uint16_t motor_addr, char n) {
 
     // Send message
     writeCmd(motor_addr, cmd_buf);
-    
+    delay(1);
     if (CAN_MSGAVAIL == _CAN.checkReceive()) {
-        _CAN.readMsgBuf(&len, unsigned char tmp_buf);
+        _CAN.readMsgBuf(&len, tmp_buf);
         if (tmp_buf[0] == cmd_buf[0]) {
             pos_buf[0] = tmp_buf[0];
             pos_buf[1] = tmp_buf[1];
@@ -170,8 +170,9 @@ void RMDx8Arduino::serialWriteTerminator() {
 
 // Private
 void RMDx8Arduino::readBuf(const uint16_t motor_addr, unsigned char *buf) {
+    delay(1);
     if (CAN_MSGAVAIL == _CAN.checkReceive()) {
-        _CAN.readMsgBuf(&len, unsigned char tmp_buf);
+        _CAN.readMsgBuf(&len, tmp_buf);
         if (tmp_buf[0] == buf[0]) {
             reply_buf[0] = tmp_buf[0];
             reply_buf[1] = tmp_buf[1];
