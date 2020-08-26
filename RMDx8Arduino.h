@@ -17,6 +17,7 @@ public:
     void canSetup();
     void readPID(const uint16_t motor_addr);
     void writePID(const uint16_t motor_addr, int posKp, int posKi, int velKp, int velKi, int iqKp, int iqKi);
+    void writeEncoderOffset(const uint16_t motor_addr, uint16_t offset);
     void readAngle(const uint16_t motor_addr, char n);
     void clearState(const uint16_t motor_addr);
     void writeCurrent(const uint16_t motor_addr, int16_t current);

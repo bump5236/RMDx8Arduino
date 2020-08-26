@@ -51,6 +51,22 @@ void RMDx8Arduino::writePID(const uint16_t motor_addr, int posKp, int posKi, int
 }
 
 
+void RMDx8Arduino::writeEncoderOffset(const uint16_t motor_addr, uint16_t offset) {
+    cmd_buf[0] = 0x91;
+    cmd_buf[1] = 0x00;
+    cmd_buf[2] = 0x00;
+    cmd_buf[3] = 0x00;
+    cmd_buf[4] = 0x00;
+    cmd_buf[5] = 0x00;
+    cmd_buf[6] = offset & 0xFF;
+    cmd_buf[7] = (offset >> 8) & 0xFF;
+
+    // Send message
+    writeCmd(motor_addr, cmd_buf);
+    readBuf(motor_addr, cmd_buf);
+}
+
+
 void RMDx8Arduino::readAngle(const uint16_t motor_addr, char n) {
     switch(n) {
         case 1: // multi turns
