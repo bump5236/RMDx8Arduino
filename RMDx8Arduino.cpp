@@ -126,8 +126,11 @@ void RMDx8Arduino::clearState(const uint16_t motor_addr) {
 }
 
 
+/**
+ * current is int16_t type, the value range:-2000~2000, corresponding to the actual torque current range -12.5A ~ 12.5A.
+ * (the bus current and the actual torque of motor vary with different motors)
+ */
 void RMDx8Arduino::writeCurrent(const uint16_t motor_addr, int16_t current) {
-    // current control is int16_t type. (2byteの符号付き整数)
     cmd_buf[0] = 0xA1;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -143,8 +146,10 @@ void RMDx8Arduino::writeCurrent(const uint16_t motor_addr, int16_t current) {
 }
 
 
+/**
+ * velocity is int32_t type, which corresponds to the actual speed of 0.01 dps/LSB.
+ */
 void RMDx8Arduino::writeVelocity(const uint16_t motor_addr, int32_t velocity) {
-    // velocity control is int32_t type. (4byteの符号付き整数)
     cmd_buf[0] = 0xA2;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -160,8 +165,12 @@ void RMDx8Arduino::writeVelocity(const uint16_t motor_addr, int32_t velocity) {
 }
 
 
+/**
+ * # Position control command 1, multi turns
+ * position is int32_t type, and the actual position is 0.01 degree/LSB, 36000 represents 360°.
+ * The motor rotation direction is determined by the difference between the target position and the current position.
+ */
 void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position) {
-    // position control is int32_t type. (4byteの符号付き整数)
     cmd_buf[0] = 0xA3;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -176,6 +185,69 @@ void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position) {
     readBuf(motor_addr, cmd_buf);
 }
 
+
+/**
+ * # Position control command 2, multi turns
+ * In addition to Position control command 1, the following functions have been added.
+ * The control value max_speed limits the maximum speed at which the motor rotates, uint16_t type, corresponding to the actual speed of 1 dps/LSB.
+ */
+void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position, uint16_t max_speed) {
+    cmd_buf[0] = 0xA4;
+    cmd_buf[1] = 0x00;
+    cmd_buf[2] = max_speed & 0xFF;
+    cmd_buf[3] = (max_speed >> 8) & 0xFF;
+    cmd_buf[4] = position & 0xFF;
+    cmd_buf[5] = (position >> 8) & 0xFF;
+    cmd_buf[6] = (position >> 16) & 0xFF;
+    cmd_buf[7] = (position >> 24) & 0xFF;
+
+    // Send message
+    writeCmd(motor_addr, cmd_buf);
+    readBuf(motor_addr, cmd_buf);
+}
+
+
+/**
+ * # Position control command 3, single turn
+ * position is uint16_t type, the value range is 0~35999, and the actual position is 0.01 degree/LSB, the actual angle range is 0°~359.99°.
+ * The control value spin_direction sets the direction in which the motor rotates, which is uint8_t type, 0x00 for CW and 0x01 for CCW.
+ */
+void RMDx8Arduino::writePosition(const uint16_t motor_addr, uint16_t position, uint8_t spin_direction) {
+    cmd_buf[0] = 0xA5;
+    cmd_buf[1] = spin_direction;
+    cmd_buf[2] = 0x00;
+    cmd_buf[3] = 0x00;
+    cmd_buf[4] = position & 0xFF;
+    cmd_buf[5] = (position >> 8) & 0xFF;
+    cmd_buf[6] = 0x00;
+    cmd_buf[7] = 0x00;
+
+    // Send message
+    writeCmd(motor_addr, cmd_buf);
+    readBuf(motor_addr, cmd_buf);
+}
+
+
+/** 
+ * # Position control command 4, single turn
+ * position is uint16_t type, the value range is 0~35999, and the actual position is 0.01 degree/LSB, the actual angle range is 0°~359.99°.
+ * The control value max_speed limits the maximum speed at which the motor rotates, uint16_t type, corresponding to the actual speed of 1 dps/LSB.
+ * The control value spin_direction sets the direction in which the motor rotates, which is uint8_t type, 0x00 for CW and 0x01 for CCW.
+ */
+void RMDx8Arduino::writePosition(const uint16_t motor_addr, uint16_t position, uint16_t max_speed, uint8_t spin_direction) {
+    cmd_buf[0] = 0xA6;
+    cmd_buf[1] = spin_direction;
+    cmd_buf[2] = max_speed & 0xFF;
+    cmd_buf[3] = (max_speed >> 8) & 0xFF;
+    cmd_buf[4] = position & 0xFF;
+    cmd_buf[5] = (position >> 8) & 0xFF;
+    cmd_buf[6] = 0x00;
+    cmd_buf[7] = 0x00;
+
+    // Send message
+    writeCmd(motor_addr, cmd_buf);
+    readBuf(motor_addr, cmd_buf);
+}
 
 // General function
 void RMDx8Arduino::serialWriteTerminator() {

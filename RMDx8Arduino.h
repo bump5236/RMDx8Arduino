@@ -23,6 +23,9 @@ public:
     void writeCurrent(const uint16_t motor_addr, int16_t current);
     void writeVelocity(const uint16_t motor_addr, int32_t velocity); 
     void writePosition(const uint16_t motor_addr, int32_t position);
+    void writePosition(const uint16_t motor_addr, int32_t position, uint16_t max_speed);
+    void writePosition(const uint16_t motor_addr, uint16_t position, uint8_t spin_direction);
+    void writePosition(const uint16_t motor_addr, uint16_t position, uint16_t max_speed, uint8_t spin_direction);
 
     // General function
     void serialWriteTerminator();
