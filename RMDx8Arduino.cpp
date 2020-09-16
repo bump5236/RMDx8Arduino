@@ -4,8 +4,10 @@
 #include <mcp_can.h>
 
 // constructor
-RMDx8Arduino::RMDx8Arduino(MCP_CAN &CAN) 
-    :_CAN(CAN){}
+RMDx8Arduino::RMDx8Arduino(MCP_CAN &CAN, const uint16_t motor_addr) 
+    :_CAN(CAN){
+        MOTOR_ADDRESS = motor_addr;
+    }
 
 
 void RMDx8Arduino::canSetup() {
@@ -18,7 +20,7 @@ void RMDx8Arduino::canSetup() {
 }
 
 
-void RMDx8Arduino::readPID(const uint16_t motor_addr) {
+void RMDx8Arduino::readPID() {
     cmd_buf[0] = 0x30;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -29,13 +31,13 @@ void RMDx8Arduino::readPID(const uint16_t motor_addr) {
     cmd_buf[7] = 0x00;
     
     // Send message
-    writeCmd(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
     delay(100);
-    readBuf(motor_addr, cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
-void RMDx8Arduino::writePID(const uint16_t motor_addr, int posKp, int posKi, int velKp, int velKi, int iqKp, int iqKi) {
+void RMDx8Arduino::writePID(int posKp, int posKi, int velKp, int velKi, int iqKp, int iqKi) {
     cmd_buf[0] = 0x31;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = posKp;
@@ -46,12 +48,12 @@ void RMDx8Arduino::writePID(const uint16_t motor_addr, int posKp, int posKi, int
     cmd_buf[7] = iqKi;
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
-void RMDx8Arduino::writeEncoderOffset(const uint16_t motor_addr, uint16_t offset) {
+void RMDx8Arduino::writeEncoderOffset(uint16_t offset) {
     cmd_buf[0] = 0x91;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -62,12 +64,12 @@ void RMDx8Arduino::writeEncoderOffset(const uint16_t motor_addr, uint16_t offset
     cmd_buf[7] = (offset >> 8) & 0xFF;
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
-void RMDx8Arduino::readAngle(const uint16_t motor_addr, char n) {
+void RMDx8Arduino::readAngle(char n) {
     switch(n) {
         case 1: // multi turns
             cmd_buf[0] = 0x92;
@@ -93,7 +95,7 @@ void RMDx8Arduino::readAngle(const uint16_t motor_addr, char n) {
     }
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
     delay(1);
     if (CAN_MSGAVAIL == _CAN.checkReceive()) {
         _CAN.readMsgBuf(&len, tmp_buf);
@@ -111,7 +113,7 @@ void RMDx8Arduino::readAngle(const uint16_t motor_addr, char n) {
 }
 
 
-void RMDx8Arduino::clearState(const uint16_t motor_addr) {
+void RMDx8Arduino::clearState() {
     cmd_buf[0] = 0x80;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -121,8 +123,8 @@ void RMDx8Arduino::clearState(const uint16_t motor_addr) {
     cmd_buf[6] = 0x00;
     cmd_buf[7] = 0x00;
 
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
@@ -130,7 +132,7 @@ void RMDx8Arduino::clearState(const uint16_t motor_addr) {
  * current is int16_t type, the value range:-2000~2000, corresponding to the actual torque current range -12.5A ~ 12.5A.
  * (the bus current and the actual torque of motor vary with different motors)
  */
-void RMDx8Arduino::writeCurrent(const uint16_t motor_addr, int16_t current) {
+void RMDx8Arduino::writeCurrent(int16_t current) {
     cmd_buf[0] = 0xA1;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -141,15 +143,15 @@ void RMDx8Arduino::writeCurrent(const uint16_t motor_addr, int16_t current) {
     cmd_buf[7] = 0x00;
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
 /**
  * velocity is int32_t type, which corresponds to the actual speed of 0.01 dps/LSB.
  */
-void RMDx8Arduino::writeVelocity(const uint16_t motor_addr, int32_t velocity) {
+void RMDx8Arduino::writeVelocity(int32_t velocity) {
     cmd_buf[0] = 0xA2;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -160,8 +162,8 @@ void RMDx8Arduino::writeVelocity(const uint16_t motor_addr, int32_t velocity) {
     cmd_buf[7] = (velocity >> 24) & 0xFF;
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
@@ -170,7 +172,7 @@ void RMDx8Arduino::writeVelocity(const uint16_t motor_addr, int32_t velocity) {
  * position is int32_t type, and the actual position is 0.01 degree/LSB, 36000 represents 360°.
  * The motor rotation direction is determined by the difference between the target position and the current position.
  */
-void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position) {
+void RMDx8Arduino::writePosition(int32_t position) {
     cmd_buf[0] = 0xA3;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -181,8 +183,8 @@ void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position) {
     cmd_buf[7] = (position >> 24) & 0xFF;
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
@@ -191,7 +193,7 @@ void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position) {
  * In addition to Position control command 1, the following functions have been added.
  * The control value max_speed limits the maximum speed at which the motor rotates, uint16_t type, corresponding to the actual speed of 1 dps/LSB.
  */
-void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position, uint16_t max_speed) {
+void RMDx8Arduino::writePosition(int32_t position, uint16_t max_speed) {
     cmd_buf[0] = 0xA4;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = max_speed & 0xFF;
@@ -202,8 +204,8 @@ void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position, ui
     cmd_buf[7] = (position >> 24) & 0xFF;
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
@@ -212,7 +214,7 @@ void RMDx8Arduino::writePosition(const uint16_t motor_addr, int32_t position, ui
  * position is uint16_t type, the value range is 0~35999, and the actual position is 0.01 degree/LSB, the actual angle range is 0°~359.99°.
  * The control value spin_direction sets the direction in which the motor rotates, which is uint8_t type, 0x00 for CW and 0x01 for CCW.
  */
-void RMDx8Arduino::writePosition(const uint16_t motor_addr, uint16_t position, uint8_t spin_direction) {
+void RMDx8Arduino::writePosition(uint16_t position, uint8_t spin_direction) {
     cmd_buf[0] = 0xA5;
     cmd_buf[1] = spin_direction;
     cmd_buf[2] = 0x00;
@@ -223,8 +225,8 @@ void RMDx8Arduino::writePosition(const uint16_t motor_addr, uint16_t position, u
     cmd_buf[7] = 0x00;
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 
@@ -234,7 +236,7 @@ void RMDx8Arduino::writePosition(const uint16_t motor_addr, uint16_t position, u
  * The control value max_speed limits the maximum speed at which the motor rotates, uint16_t type, corresponding to the actual speed of 1 dps/LSB.
  * The control value spin_direction sets the direction in which the motor rotates, which is uint8_t type, 0x00 for CW and 0x01 for CCW.
  */
-void RMDx8Arduino::writePosition(const uint16_t motor_addr, uint16_t position, uint16_t max_speed, uint8_t spin_direction) {
+void RMDx8Arduino::writePosition(uint16_t position, uint16_t max_speed, uint8_t spin_direction) {
     cmd_buf[0] = 0xA6;
     cmd_buf[1] = spin_direction;
     cmd_buf[2] = max_speed & 0xFF;
@@ -245,8 +247,8 @@ void RMDx8Arduino::writePosition(const uint16_t motor_addr, uint16_t position, u
     cmd_buf[7] = 0x00;
 
     // Send message
-    writeCmd(motor_addr, cmd_buf);
-    readBuf(motor_addr, cmd_buf);
+    writeCmd(cmd_buf);
+    readBuf(cmd_buf);
 }
 
 // General function
@@ -257,7 +259,7 @@ void RMDx8Arduino::serialWriteTerminator() {
 
 
 // Private
-void RMDx8Arduino::readBuf(const uint16_t motor_addr, unsigned char *buf) {
+void RMDx8Arduino::readBuf(unsigned char *buf) {
     delay(1);
     if (CAN_MSGAVAIL == _CAN.checkReceive()) {
         _CAN.readMsgBuf(&len, tmp_buf);
@@ -275,9 +277,9 @@ void RMDx8Arduino::readBuf(const uint16_t motor_addr, unsigned char *buf) {
 }
 
 
-void RMDx8Arduino::writeCmd(const uint16_t motor_addr, unsigned char *buf) {
+void RMDx8Arduino::writeCmd(unsigned char *buf) {
     // CAN通信で送る
-    unsigned char sendState = _CAN.sendMsgBuf(motor_addr, 0, 8, buf);
+    unsigned char sendState = _CAN.sendMsgBuf(MOTOR_ADDRESS, 0, 8, buf);
     if (sendState != CAN_OK) {
         Serial.println("Error Sending Message...");
         Serial.println(sendState);

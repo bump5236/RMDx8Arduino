@@ -17,22 +17,34 @@ const uint16_t MOTOR_ADDRESS = 0x141; //0x140 + ID(1~32)
 const int SPI_CS_PIN = 10;
 
 MCP_CAN CAN(SPI_CS_PIN); //set CS PIN
-RMDx8Arduino rmd(CAN);
+RMDx8Arduino rmd1(CAN, MOTOR_ADDRESS);
+// RMDx8Arduino rmd2(CAN, 0x142);
 
 void setup() {
     SERIAL.begin(BAUDRATE);
     delay(1000);
 
-    rmd.canSetup();
-    rmd.readPID(MOTOR_ADDRESS);
-    SERIAL.print("POSKp:");
-    SERIAL.println(rmd.reply_buf[2]);
-    SERIAL.print("POSKi:");
-    SERIAL.println(rmd.reply_buf[3]);
+    rmd1.canSetup();
+    // rmd2.canSetup();
 
-    rmd.writePosition(MOTOR_ADDRESS, 10000);
+    rmd1.readPID();
+    // rmd2.readPID();
 
-    delay(1000);
+    SERIAL.print("POSKp1:");
+    SERIAL.println(rmd1.reply_buf[2]);
+    SERIAL.print("POSKi1:");
+    SERIAL.println(rmd1.reply_buf[3]);
+    
+    // SERIAL.print("POSKp2:");
+    // SERIAL.println(rmd2.reply_buf[2]);
+    // SERIAL.print("POSKi2:");
+    // SERIAL.println(rmd2.reply_buf[3]);
+
+    rmd1.writePosition(10000);
+    delay(1000)
+    
+    // rmd2.writePosition(10000);
+    // delay(1000);
 
 }
 
