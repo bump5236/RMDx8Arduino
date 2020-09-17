@@ -41,7 +41,7 @@ void setup() {
     // SERIAL.println(rmd2.reply_buf[3]);
 
     rmd1.writePosition(10000);
-    delay(1000)
+    delay(1000);
     
     // rmd2.writePosition(10000);
     // delay(1000);

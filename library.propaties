@@ -1,5 +1,5 @@
 name=RMDx8 Arduino Library
-version=1.0.0
+version=1.1.0
 author=Takuya Sanada
 maintainer=Sanolab <http://rah.web.nitech.ac.jp/>
 sentence=This is a library for control RMD-X8 with can.
