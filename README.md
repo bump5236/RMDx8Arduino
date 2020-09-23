@@ -15,7 +15,10 @@ RMD-X8モータのCAN通信用コマンドのクラス
 1. CAN-BUS Shield
    Arduino IDE のライブラリマネージャーからインストール
 
-2. 本リポジトリをクローンもしくはダウンロードし、C:\Users\ユーザー名\Documents\Arduino\libraries\に保存
+2. 本リポジトリをクローンもしくはダウンロードし、
+Windows :` C:\Users\ユーザー名\Documents\Arduino\libraries\`
+Linux : `/snap/arduino/41/Arduino/libraries/`
+に保存
 
 # Usage
 C:\Users\ユーザー名\Documents\Arduino\librariesのディレクトリに配置されていれば、\
