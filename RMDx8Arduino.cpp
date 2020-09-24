@@ -96,7 +96,7 @@ void RMDx8Arduino::readAngle(char n) {
 
     // Send message
     writeCmd(cmd_buf);
-    delay(1);
+    delayMicroseconds(50);    // 50us
     if (CAN_MSGAVAIL == _CAN.checkReceive()) {
         _CAN.readMsgBuf(&len, tmp_buf);
         if (tmp_buf[0] == cmd_buf[0]) {
@@ -260,7 +260,7 @@ void RMDx8Arduino::serialWriteTerminator() {
 
 // Private
 void RMDx8Arduino::readBuf(unsigned char *buf) {
-    delay(1);
+    delayMicroseconds(50);    // 50us
     if (CAN_MSGAVAIL == _CAN.checkReceive()) {
         _CAN.readMsgBuf(&len, tmp_buf);
         if (tmp_buf[0] == buf[0]) {
