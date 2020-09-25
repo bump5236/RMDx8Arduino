@@ -14,7 +14,7 @@
 //the cs pin of the version after v1.1 is default to D9
 //v0.9b and v1.0 is default D10
 const uint16_t MOTOR_ADDRESS = 0x141; //0x140 + ID(1~32)
-const int SPI_CS_PIN = 10;
+const int SPI_CS_PIN = 9;
 
 MCP_CAN CAN(SPI_CS_PIN); //set CS PIN
 RMDx8Arduino rmd1(CAN, MOTOR_ADDRESS);
@@ -40,14 +40,11 @@ void setup() {
     SERIAL.print("POSKi2:");
     SERIAL.println(rmd2.posKi);
     
-    // rmd2.writePosition(10000);
-    // delay(1000);
-
+    delay(3000);
 }
 
 void loop() {
-    int32_t tgt_pos1 = 18000;
-    rmd1.writePosition(tgt_pos1);
+    rmd1.writeCurrent(0);
     rmd1.readPosition();
 
     SERIAL.print("CUR1:");
@@ -57,10 +54,10 @@ void loop() {
     SERIAL.print(rmd1.velocity);
     SERIAL.print("\t");
     SERIAL.print("POS1:");
-    SERIAL.println(rmd1.position);
-
-    int32_t tgt_pos2 = 18000;
-    rmd2.writePosition(tgt_pos2);
+    SERIAL.print(rmd1.position);
+    SERIAL.print("\t");
+    
+    rmd2.writeCurrent(0);
     rmd2.readPosition();
 
     SERIAL.print("CUR2:");

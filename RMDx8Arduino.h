@@ -21,7 +21,7 @@ public:
     // Commands
     void canSetup();
     void readPID();
-    void writePID(int posKp, int posKi, int velKp, int velKi, int iqKp, int iqKi);
+    void writePID(uint8_t anglePidKp, uint8_t anglePidKi, uint8_t speedPidKp, uint8_t speedPidKi, uint8_t iqPidKp, uint8_t iqPidKi);
     void writeEncoderOffset(uint16_t offset);
     void readPosition();
     void clearState();

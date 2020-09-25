@@ -90,7 +90,7 @@ void RMDx8Arduino::readPosition() {
     writeCmd(cmd_buf);
     readBuf(cmd_buf);
 
-    pos_u32t = ((uint32_t)cmd_buf[4] << 24) + ((uint32_t)cmd_buf[3] << 16) + ((uint32_t)cmd_buf[2] << 8) + cmd_buf[1];
+    pos_u32t = ((uint32_t)reply_buf[4] << 24) + ((uint32_t)reply_buf[3] << 16) + ((uint32_t)reply_buf[2] << 8) + reply_buf[1];
 
     if (pos_u32t > 2147483648) {
         position = pos_u32t - 4294967296;
@@ -278,7 +278,7 @@ void RMDx8Arduino::serialWriteTerminator() {
 
 // Private
 void RMDx8Arduino::readBuf(unsigned char *buf) {
-    delayMicroseconds(50);    // 50us
+    delayMicroseconds(600);    // 1000us
     if (CAN_MSGAVAIL == _CAN.checkReceive()) {
         _CAN.readMsgBuf(&len, tmp_buf);
         if (tmp_buf[0] == buf[0]) {
