@@ -18,30 +18,27 @@ const int SPI_CS_PIN = 10;
 
 MCP_CAN CAN(SPI_CS_PIN); //set CS PIN
 RMDx8Arduino rmd1(CAN, MOTOR_ADDRESS);
-// RMDx8Arduino rmd2(CAN, 0x142);
+RMDx8Arduino rmd2(CAN, 0x142);
 
 void setup() {
     SERIAL.begin(BAUDRATE);
     delay(1000);
 
     rmd1.canSetup();
-    // rmd2.canSetup();
+    rmd2.canSetup();
 
     rmd1.readPID();
-    // rmd2.readPID();
+    rmd2.readPID();
 
     SERIAL.print("POSKp1:");
-    SERIAL.println(rmd1.reply_buf[2]);
+    SERIAL.println(rmd1.posKp);
     SERIAL.print("POSKi1:");
-    SERIAL.println(rmd1.reply_buf[3]);
+    SERIAL.println(rmd1.posKi);
     
-    // SERIAL.print("POSKp2:");
-    // SERIAL.println(rmd2.reply_buf[2]);
-    // SERIAL.print("POSKi2:");
-    // SERIAL.println(rmd2.reply_buf[3]);
-
-    rmd1.writePosition(10000);
-    delay(1000);
+    SERIAL.print("POSKp2:");
+    SERIAL.println(rmd2.posKp);
+    SERIAL.print("POSKi2:");
+    SERIAL.println(rmd2.posKi);
     
     // rmd2.writePosition(10000);
     // delay(1000);
@@ -49,5 +46,29 @@ void setup() {
 }
 
 void loop() {
-    
+    int32_t tgt_pos1 = 18000;
+    rmd1.writePosition(tgt_pos1);
+    rmd1.readPosition();
+
+    SERIAL.print("CUR1:");
+    SERIAL.print(rmd1.current);
+    SERIAL.print("\t");
+    SERIAL.print("VEL1:");
+    SERIAL.print(rmd1.velocity);
+    SERIAL.print("\t");
+    SERIAL.print("POS1:");
+    SERIAL.println(rmd1.position);
+
+    int32_t tgt_pos2 = 18000;
+    rmd2.writePosition(tgt_pos2);
+    rmd2.readPosition();
+
+    SERIAL.print("CUR2:");
+    SERIAL.print(rmd2.current);
+    SERIAL.print("\t");
+    SERIAL.print("VEL2:");
+    SERIAL.print(rmd2.velocity);
+    SERIAL.print("\t");
+    SERIAL.print("POS2:");
+    SERIAL.println(rmd2.position);
 }
