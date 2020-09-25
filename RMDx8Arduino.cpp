@@ -76,7 +76,7 @@ void RMDx8Arduino::writeEncoderOffset(uint16_t offset) {
 }
 
 
-int32_t RMDx8Arduino::readPosition() {
+void RMDx8Arduino::readPosition() {
     cmd_buf[0] = 0x92;
     cmd_buf[1] = 0x00;
     cmd_buf[2] = 0x00;
@@ -98,8 +98,6 @@ int32_t RMDx8Arduino::readPosition() {
     else {
         position = pos_u32t;
     }
-
-    return position;
 }
 
 
