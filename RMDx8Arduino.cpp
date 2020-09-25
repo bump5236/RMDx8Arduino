@@ -34,18 +34,25 @@ void RMDx8Arduino::readPID() {
     writeCmd(cmd_buf);
     delay(100);
     readBuf(cmd_buf);
+
+    posKp = reply_buf[2];
+    posKi = reply_buf[3];
+    velKp = reply_buf[4];
+    velKi = reply_buf[5];
+    curKp = reply_buf[6];
+    curKi = reply_buf[7];
 }
 
 
-void RMDx8Arduino::writePID(int posKp, int posKi, int velKp, int velKi, int iqKp, int iqKi) {
+void RMDx8Arduino::writePID(uint8_t anglePidKp, uint8_t anglePidKi, uint8_t speedPidKp, uint8_t speedPidKi, uint8_t iqPidKp, uint8_t iqPidKi) {
     cmd_buf[0] = 0x31;
     cmd_buf[1] = 0x00;
-    cmd_buf[2] = posKp;
-    cmd_buf[3] = posKi;
-    cmd_buf[4] = velKp;
-    cmd_buf[5] = velKi;
-    cmd_buf[6] = iqKp;
-    cmd_buf[7] = iqKi;
+    cmd_buf[2] = anglePidKp;
+    cmd_buf[3] = anglePidKi;
+    cmd_buf[4] = speedPidKp;
+    cmd_buf[5] = speedPidKi;
+    cmd_buf[6] = iqPidKp;
+    cmd_buf[7] = iqPidKi;
 
     // Send message
     writeCmd(cmd_buf);
@@ -69,47 +76,30 @@ void RMDx8Arduino::writeEncoderOffset(uint16_t offset) {
 }
 
 
-void RMDx8Arduino::readAngle(char n) {
-    switch(n) {
-        case 1: // multi turns
-            cmd_buf[0] = 0x92;
-            cmd_buf[1] = 0x00;
-            cmd_buf[2] = 0x00;
-            cmd_buf[3] = 0x00;
-            cmd_buf[4] = 0x00;
-            cmd_buf[5] = 0x00;
-            cmd_buf[6] = 0x00;
-            cmd_buf[7] = 0x00;
-            break;
-        
-        default: // single circle
-            cmd_buf[0] = 0x94;
-            cmd_buf[1] = 0x00;
-            cmd_buf[2] = 0x00;
-            cmd_buf[3] = 0x00;
-            cmd_buf[4] = 0x00;
-            cmd_buf[5] = 0x00;
-            cmd_buf[6] = 0x00;
-            cmd_buf[7] = 0x00;
-            break;
-    }
+int32_t RMDx8Arduino::readPosition() {
+    cmd_buf[0] = 0x92;
+    cmd_buf[1] = 0x00;
+    cmd_buf[2] = 0x00;
+    cmd_buf[3] = 0x00;
+    cmd_buf[4] = 0x00;
+    cmd_buf[5] = 0x00;
+    cmd_buf[6] = 0x00;
+    cmd_buf[7] = 0x00;
 
     // Send message
     writeCmd(cmd_buf);
-    delayMicroseconds(50);    // 50us
-    if (CAN_MSGAVAIL == _CAN.checkReceive()) {
-        _CAN.readMsgBuf(&len, tmp_buf);
-        if (tmp_buf[0] == cmd_buf[0]) {
-            pos_buf[0] = tmp_buf[0];
-            pos_buf[1] = tmp_buf[1];
-            pos_buf[2] = tmp_buf[2];
-            pos_buf[3] = tmp_buf[3];
-            pos_buf[4] = tmp_buf[4];
-            pos_buf[5] = tmp_buf[5];
-            pos_buf[6] = tmp_buf[6];
-            pos_buf[7] = tmp_buf[7];
-        }
+    readBuf(cmd_buf);
+
+    pos_u32t = ((uint32_t)cmd_buf[4] << 24) + ((uint32_t)cmd_buf[3] << 16) + ((uint32_t)cmd_buf[2] << 8) + cmd_buf[1];
+
+    if (pos_u32t > 2147483648) {
+        position = pos_u32t - 4294967296;
     }
+    else {
+        position = pos_u32t;
+    }
+
+    return position;
 }
 
 
@@ -145,6 +135,11 @@ void RMDx8Arduino::writeCurrent(int16_t current) {
     // Send message
     writeCmd(cmd_buf);
     readBuf(cmd_buf);
+
+    temperature = reply_buf[1];
+    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
 
@@ -164,6 +159,11 @@ void RMDx8Arduino::writeVelocity(int32_t velocity) {
     // Send message
     writeCmd(cmd_buf);
     readBuf(cmd_buf);
+
+    temperature = reply_buf[1];
+    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
 
@@ -185,6 +185,11 @@ void RMDx8Arduino::writePosition(int32_t position) {
     // Send message
     writeCmd(cmd_buf);
     readBuf(cmd_buf);
+
+    temperature = reply_buf[1];
+    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
 
@@ -206,6 +211,11 @@ void RMDx8Arduino::writePosition(int32_t position, uint16_t max_speed) {
     // Send message
     writeCmd(cmd_buf);
     readBuf(cmd_buf);
+
+    temperature = reply_buf[1];
+    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
 
@@ -227,6 +237,11 @@ void RMDx8Arduino::writePosition(uint16_t position, uint8_t spin_direction) {
     // Send message
     writeCmd(cmd_buf);
     readBuf(cmd_buf);
+
+    temperature = reply_buf[1];
+    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
 
@@ -249,6 +264,11 @@ void RMDx8Arduino::writePosition(uint16_t position, uint16_t max_speed, uint8_t 
     // Send message
     writeCmd(cmd_buf);
     readBuf(cmd_buf);
+
+    temperature = reply_buf[1];
+    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
 // General function

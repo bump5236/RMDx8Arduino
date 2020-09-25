@@ -10,7 +10,11 @@ class RMDx8Arduino {
 public:
     unsigned char len;
     unsigned char tmp_buf[8], cmd_buf[8], reply_buf[8], pos_buf[8];
-    uint16_t MOTOR_ADDRESS;
+    int8_t temperature;
+    uint8_t posKp, posKi, velKp, velKi, curKp, curKi;
+    int16_t current, velocity;
+    uint16_t MOTOR_ADDRESS, encoder_pos;
+    int32_t position;
 
     RMDx8Arduino(MCP_CAN &CAN, const uint16_t motor_addr);    // クラスと同一の名前にするとコンストラクタ扱い
 
@@ -19,7 +23,7 @@ public:
     void readPID();
     void writePID(int posKp, int posKi, int velKp, int velKi, int iqKp, int iqKi);
     void writeEncoderOffset(uint16_t offset);
-    void readAngle(char n);
+    void readPosition();
     void clearState();
     void writeCurrent(int16_t current);
     void writeVelocity(int32_t velocity); 
@@ -33,6 +37,8 @@ public:
 
 private:
     MCP_CAN _CAN;
+    uint32_t pos_u32t;
+
     void readBuf(unsigned char *buf);
     void writeCmd(unsigned char *buf);
 };
