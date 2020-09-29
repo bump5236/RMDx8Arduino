@@ -93,10 +93,10 @@ void RMDx8Arduino::readPosition() {
     pos_u32t = ((uint32_t)reply_buf[4] << 24) + ((uint32_t)reply_buf[3] << 16) + ((uint32_t)reply_buf[2] << 8) + reply_buf[1];
 
     if (pos_u32t > 2147483648) {
-        position = pos_u32t - 4294967296;
+        present_position = pos_u32t - 4294967296;
     }
     else {
-        position = pos_u32t;
+        present_position = pos_u32t;
     }
 }
 
@@ -135,8 +135,8 @@ void RMDx8Arduino::writeCurrent(int16_t current) {
     readBuf(cmd_buf);
 
     temperature = reply_buf[1];
-    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
-    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    present_current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    present_velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
     encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
@@ -159,8 +159,8 @@ void RMDx8Arduino::writeVelocity(int32_t velocity) {
     readBuf(cmd_buf);
 
     temperature = reply_buf[1];
-    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
-    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    present_current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    present_velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
     encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
@@ -185,8 +185,8 @@ void RMDx8Arduino::writePosition(int32_t position) {
     readBuf(cmd_buf);
 
     temperature = reply_buf[1];
-    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
-    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    present_current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    present_velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
     encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
@@ -211,8 +211,8 @@ void RMDx8Arduino::writePosition(int32_t position, uint16_t max_speed) {
     readBuf(cmd_buf);
 
     temperature = reply_buf[1];
-    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
-    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    present_current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    present_velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
     encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
@@ -237,8 +237,8 @@ void RMDx8Arduino::writePosition(uint16_t position, uint8_t spin_direction) {
     readBuf(cmd_buf);
 
     temperature = reply_buf[1];
-    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
-    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    present_current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    present_velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
     encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 
@@ -264,8 +264,8 @@ void RMDx8Arduino::writePosition(uint16_t position, uint16_t max_speed, uint8_t 
     readBuf(cmd_buf);
 
     temperature = reply_buf[1];
-    current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
-    velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
+    present_current = ((int16_t)reply_buf[3] << 8) + reply_buf[2];
+    present_velocity = ((int16_t)reply_buf[5] << 8) + reply_buf[4];
     encoder_pos = ((uint16_t)reply_buf[7] << 8) + reply_buf[6];
 }
 

@@ -48,24 +48,24 @@ void loop() {
     rmd1.readPosition();
 
     SERIAL.print("CUR1:");
-    SERIAL.print(rmd1.current);
+    SERIAL.print(rmd1.present_current);
     SERIAL.print("\t");
     SERIAL.print("VEL1:");
-    SERIAL.print(rmd1.velocity);
+    SERIAL.print(rmd1.present_velocity);
     SERIAL.print("\t");
     SERIAL.print("POS1:");
-    SERIAL.print(rmd1.position);
+    SERIAL.print(rmd1.present_position);
     SERIAL.print("\t");
     
     rmd2.writeCurrent(0);
     rmd2.readPosition();
 
     SERIAL.print("CUR2:");
-    SERIAL.print(rmd2.current);
+    SERIAL.print(rmd2.present_current);
     SERIAL.print("\t");
     SERIAL.print("VEL2:");
-    SERIAL.print(rmd2.velocity);
+    SERIAL.print(rmd2.present_velocity);
     SERIAL.print("\t");
     SERIAL.print("POS2:");
-    SERIAL.println(rmd2.position);
+    SERIAL.println(rmd2.present_position);
 }

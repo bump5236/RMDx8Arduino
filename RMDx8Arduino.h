@@ -12,9 +12,9 @@ public:
     unsigned char tmp_buf[8], cmd_buf[8], reply_buf[8], pos_buf[8];
     int8_t temperature;
     uint8_t posKp, posKi, velKp, velKi, curKp, curKi;
-    int16_t current, velocity;
+    int16_t present_current, present_velocity;
     uint16_t MOTOR_ADDRESS, encoder_pos;
-    int32_t position;
+    int32_t present_position;
 
     RMDx8Arduino(MCP_CAN &CAN, const uint16_t motor_addr);    // クラスと同一の名前にするとコンストラクタ扱い
 
